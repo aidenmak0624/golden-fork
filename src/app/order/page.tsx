@@ -129,6 +129,9 @@ function OrderPageContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  // Customization modal state (must be before early return — React hooks rules)
+  const [customizingItem, setCustomizingItem] = useState<MenuItemData | null>(null);
+  const [customizationSelections, setCustomizationSelections] = useState<Record<string, string>>({});
 
   // Show table selection if no table ID provided
   if (!tableId) {
@@ -166,10 +169,6 @@ function OrderPageContent() {
       item.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
-
-  // Customization modal state
-  const [customizingItem, setCustomizingItem] = useState<MenuItemData | null>(null);
-  const [customizationSelections, setCustomizationSelections] = useState<Record<string, string>>({});
 
   // Cart functions
   const addToCart = (item: MenuItemData, customizations?: Record<string, string>) => {
