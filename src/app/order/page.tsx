@@ -119,7 +119,9 @@ const tagConfig: Record<string, { label: string; color: string; icon?: React.Rea
 
 function OrderPageContent() {
   const searchParams = useSearchParams();
-  const tableId = searchParams.get('table') || undefined;
+  const tableParam = searchParams.get('table') || undefined;
+  const [selectedTable, setSelectedTable] = useState<string | undefined>(tableParam);
+  const tableId = selectedTable;
 
   const [activeCategory, setActiveCategory] = useState('all');
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -127,6 +129,33 @@ function OrderPageContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
+
+  // Show table selection if no table ID provided
+  if (!tableId) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-sm w-full text-center">
+          <div className="text-4xl mb-4">🍽️</div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome to The Golden Fork</h1>
+          <p className="text-gray-500 mb-6">Please select your table number to start ordering</p>
+          <div className="grid grid-cols-5 gap-3 mb-6">
+            {Array.from({ length: 15 }, (_, i) => i + 1).map((num) => (
+              <button
+                key={num}
+                onClick={() => setSelectedTable(String(num))}
+                className="aspect-square rounded-xl bg-amber-50 border-2 border-amber-200 text-amber-700 font-bold text-lg hover:bg-amber-100 hover:border-amber-400 transition-colors flex items-center justify-center"
+              >
+                {num}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs text-gray-400">
+            Normally this is set automatically via your table&apos;s QR code
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   // Filter menu items
   const filteredItems = menuItems.filter((item) => {
