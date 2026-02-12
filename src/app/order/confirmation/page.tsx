@@ -18,9 +18,11 @@ import {
   ArrowLeft,
   Receipt,
   MessageSquare,
+  Check,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useOrderTracking, statusDisplayConfig, OrderStatus } from '../../../hooks/useOrderTracking';
+import { useCallServer } from '../../../hooks/useCallServer';
 import FeedbackForm from '../../../components/feedback/FeedbackForm';
 
 const statusSteps: { status: OrderStatus; label: string; icon: any; description: string }[] = [
@@ -53,6 +55,11 @@ function ConfirmationPageContent() {
 
   // Always fetch order from API — checkout creates it in-memory before redirecting here
   const { order, status, isLoading, error, estimatedTime } = useOrderTracking(orderId);
+
+  // Call Server functionality
+  const { callServer, isLoading: serverCallLoading, isCalled: serverCalled } = useCallServer({
+    tableId: tableId || undefined,
+  });
 
   const getCurrentStepIndex = () => {
     if (!status) return -1;
@@ -300,8 +307,33 @@ function ConfirmationPageContent() {
           >
             Order More
           </Link>
-          <button className="flex-1 py-3 rounded-lg bg-amber-600 text-center text-white font-medium hover:bg-amber-700 transition-colors">
-            Call Server
+          <button
+            onClick={() => callServer()}
+            disabled={serverCallLoading || serverCalled}
+            className={`flex-1 py-3 rounded-lg text-center text-white font-medium transition-colors flex items-center justify-center gap-2 ${
+              serverCalled
+                ? 'bg-green-600'
+                : serverCallLoading
+                ? 'bg-amber-400 cursor-wait'
+                : 'bg-amber-600 hover:bg-amber-700'
+            }`}
+          >
+            {serverCallLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Calling...
+              </>
+            ) : serverCalled ? (
+              <>
+                <Check className="h-4 w-4" />
+                Server Notified!
+              </>
+            ) : (
+              <>
+                <Bell className="h-4 w-4" />
+                Call Server
+              </>
+            )}
           </button>
         </div>
 

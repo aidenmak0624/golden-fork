@@ -13,6 +13,7 @@ import {
   Utensils, ShoppingBag, Check, Trash2, Minus,
   Bell, Star, MessageCircle
 } from 'lucide-react';
+import { playNotificationSound } from '../../hooks/useCallServer';
 
 interface Message {
   id: string;
@@ -150,6 +151,25 @@ export default function ChatWidget({
     setInputValue('');
     setIsLoading(true);
 
+    // Check if this is a cutlery/utensil request — auto-call server
+    const detectedItem = detectCutleryRequest(userMessage.content);
+    if (detectedItem && !serverCalled) {
+      // Silently call server in the background with a specific message
+      fetch('/api/service-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tableId: tableId || 'unknown',
+          type: 'call_server',
+          message: `Customer requests: ${userMessage.content}`,
+        }),
+      }).then(() => {
+        playNotificationSound();
+        setServerCalled(true);
+        setTimeout(() => setServerCalled(false), 5000);
+      }).catch((err) => console.error('Auto call-server failed:', err));
+    }
+
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -204,6 +224,21 @@ export default function ChatWidget({
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+
+      // If cutlery was detected, add a notification message
+      if (detectedItem && !serverCalled) {
+        setTimeout(() => {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `msg-${Date.now()}-svc`,
+              role: 'assistant',
+              content: `🔔 I've also notified your server to bring what you need. They'll be with you shortly!`,
+              timestamp: new Date(),
+            },
+          ]);
+        }, 500);
+      }
     } catch (error) {
       console.error('Chat error:', error);
       setMessages((prev) => [
@@ -242,6 +277,9 @@ export default function ChatWidget({
           message: 'Customer is requesting server assistance',
         }),
       });
+
+      // Play notification chime
+      playNotificationSound();
 
       setServerCalled(true);
       setTimeout(() => setServerCalled(false), 5000);
@@ -297,6 +335,29 @@ export default function ChatWidget({
     } catch (error) {
       console.error('Failed to submit feedback:', error);
     }
+  };
+
+  // Detect if a message is requesting utensils/cutlery — auto-call server
+  const CUTLERY_KEYWORDS = [
+    'spoon', 'fork', 'knife', 'chopstick', 'cutlery', 'utensil',
+    'napkin', 'straw', 'plate', 'bowl', 'cup', 'glass',
+    'tissue', 'toothpick', 'serviette', 'condiment',
+    'ketchup', 'mustard', 'salt', 'pepper', 'sauce',
+    'water', 'refill',
+  ];
+
+  const detectCutleryRequest = (message: string): string | null => {
+    const lower = message.toLowerCase();
+    // Check if message is a request (contains "need", "bring", "get", "can i have", "please", etc.)
+    const isRequest = /\b(need|bring|get|give|want|can i have|could i|please|more|extra|another)\b/i.test(lower);
+    if (!isRequest) return null;
+
+    for (const keyword of CUTLERY_KEYWORDS) {
+      if (lower.includes(keyword)) {
+        return keyword;
+      }
+    }
+    return null;
   };
 
   const quickPrompts = [

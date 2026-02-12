@@ -45,7 +45,7 @@ function StarRating({
   return (
     <div className="flex flex-col items-center gap-2">
       <span className="text-sm text-gray-600 font-medium">{label}</span>
-      <div className="flex gap-1">
+      <div className="flex gap-2">
         {[1, 2, 3, 4, 5].map((star) => (
           <button
             key={star}
@@ -53,7 +53,7 @@ function StarRating({
             onClick={() => onChange(star)}
             onMouseEnter={() => setHovered(star)}
             onMouseLeave={() => setHovered(0)}
-            className="focus:outline-none transition-transform hover:scale-110 p-1"
+            className="focus:outline-none transition-transform hover:scale-110 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
             <Star
               className={`${sizeClasses[size]} transition-colors ${
@@ -168,7 +168,7 @@ export default function FeedbackForm({
         {/* Overall Rating */}
         <div className="text-center">
           <p className="text-gray-700 font-medium mb-3">Overall Experience</p>
-          <div className="flex justify-center gap-2">
+          <div className="flex justify-center gap-3">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
@@ -176,7 +176,7 @@ export default function FeedbackForm({
                 onClick={() => setOverallRating(star)}
                 onMouseEnter={() => setOverallHovered(star)}
                 onMouseLeave={() => setOverallHovered(0)}
-                className="focus:outline-none transition-transform hover:scale-110 p-1"
+                className="focus:outline-none transition-transform hover:scale-110 p-2 min-w-[48px] min-h-[48px] flex items-center justify-center"
               >
                 <Star
                   className={`h-10 w-10 transition-colors ${
@@ -204,24 +204,24 @@ export default function FeedbackForm({
         </div>
 
         {/* Category Ratings */}
-        <div className="grid grid-cols-3 gap-4 py-4 border-y border-gray-100">
+        <div className="flex flex-col sm:flex-row sm:justify-around gap-5 py-4 border-y border-gray-100">
           <StarRating
             value={foodRating}
             onChange={setFoodRating}
             label="Food"
-            size="sm"
+            size="md"
           />
           <StarRating
             value={serviceRating}
             onChange={setServiceRating}
             label="Service"
-            size="sm"
+            size="md"
           />
           <StarRating
             value={ambienceRating}
             onChange={setAmbienceRating}
             label="Ambience"
-            size="sm"
+            size="md"
           />
         </div>
 
@@ -236,7 +236,7 @@ export default function FeedbackForm({
                   className="flex items-center justify-between p-3 rounded-lg bg-gray-50"
                 >
                   <span className="text-sm text-gray-700">{item.name}</span>
-                  <div className="flex gap-1">
+                  <div className="flex gap-0.5">
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
                         key={star}
@@ -244,10 +244,10 @@ export default function FeedbackForm({
                         onClick={() =>
                           setMenuItemRatings((prev) => ({ ...prev, [item.id]: star }))
                         }
-                        className="focus:outline-none p-0.5"
+                        className="focus:outline-none p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center"
                       >
                         <Star
-                          className={`h-4 w-4 transition-colors ${
+                          className={`h-5 w-5 transition-colors ${
                             star <= (menuItemRatings[item.id] || 0)
                               ? 'fill-amber-400 text-amber-400'
                               : 'fill-transparent text-gray-300'

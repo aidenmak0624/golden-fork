@@ -532,9 +532,9 @@ function OrderPageContent() {
         </>
       )}
 
-      {/* Floating Cart Summary */}
+      {/* Floating Cart Summary — positioned above the chatbot button */}
       {getCartCount() > 0 && !isCartOpen && (
-        <div className="fixed bottom-24 left-4 right-4 z-40 animate-slideIn">
+        <div className="fixed bottom-28 left-4 right-20 z-40 animate-slideIn">
           <button
             onClick={() => setIsCartOpen(true)}
             className="w-full flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-amber-600 to-orange-500 text-white shadow-xl shadow-amber-500/30 hover:shadow-2xl hover:scale-[1.02] transition-all active:scale-[0.98]"
