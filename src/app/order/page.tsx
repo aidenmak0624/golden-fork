@@ -7,12 +7,12 @@
  * Includes the AI Chat Widget for recommendations.
  */
 
-import React, { useState, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ChatWidget from '../../components/chat/ChatWidget';
 import {
   ShoppingCart, Plus, Minus, Search, X, Loader2, CreditCard,
-  Utensils, Leaf, Flame, ChevronRight, Sparkles
+  Utensils, Leaf, Flame, ChevronRight, Sparkles, ChefHat, Star
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -133,20 +133,40 @@ function OrderPageContent() {
   const [customizingItem, setCustomizingItem] = useState<MenuItemData | null>(null);
   const [customizationSelections, setCustomizationSelections] = useState<Record<string, string>>({});
 
+  // Chef's Choice state
+  const [chefsChoice, setChefsChoice] = useState<{
+    items: { id: string; name: string; description: string; reason: string }[];
+    message: string;
+  } | null>(null);
+
+  // Fetch Chef's Choice on mount
+  useEffect(() => {
+    fetch('/api/admin/chefs-choice')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.items && data.items.length > 0) {
+          setChefsChoice(data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // Show table selection if no table ID provided
   if (!tableId) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-sm w-full text-center">
-          <div className="text-4xl mb-4">🍽️</div>
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-3xl shadow-xl p-8 max-w-sm w-full text-center border border-amber-100">
+          <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mx-auto mb-5 shadow-lg shadow-amber-500/30">
+            <Utensils className="h-8 w-8 text-white" />
+          </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome to The Golden Fork</h1>
           <p className="text-gray-500 mb-6">Please enter your table number to start ordering</p>
-          <div className="flex items-center gap-3 mb-6">
+          <div className="flex items-center gap-3 mb-6 overflow-hidden">
             <input
               type="number"
               min="1"
               placeholder="Table #"
-              className="flex-1 text-center text-2xl font-bold py-3 px-4 rounded-xl border-2 border-amber-200 focus:border-amber-500 focus:outline-none bg-amber-50 text-amber-700 placeholder-amber-300"
+              className="flex-1 min-w-0 text-center text-2xl font-bold py-3.5 px-4 rounded-2xl border-2 border-amber-200 focus:border-amber-500 focus:outline-none focus:ring-4 focus:ring-amber-500/20 bg-amber-50/50 text-amber-700 placeholder-amber-300 transition-all"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
                   const val = (e.target as HTMLInputElement).value.trim();
@@ -161,7 +181,7 @@ function OrderPageContent() {
                 const val = input?.value.trim();
                 if (val && Number(val) > 0) setSelectedTable(val);
               }}
-              className="py-3 px-6 rounded-xl bg-amber-600 text-white font-bold text-lg hover:bg-amber-700 transition-colors"
+              className="flex-shrink-0 py-3.5 px-7 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-lg shadow-lg shadow-amber-500/30 hover:shadow-xl transition-all active:scale-95"
             >
               Go
             </button>
@@ -372,6 +392,58 @@ function OrderPageContent() {
 
       {/* Menu Items */}
       <main className="px-4 py-6 pb-32">
+        {/* Chef's Choice Banner */}
+        {chefsChoice && chefsChoice.items.length > 0 && (
+          <div className="mb-6 rounded-2xl bg-gradient-to-r from-amber-50 via-orange-50 to-rose-50 border border-amber-200 overflow-hidden">
+            <div className="flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-500">
+              <ChefHat className="h-5 w-5 text-white" />
+              <h3 className="font-bold text-white text-sm tracking-wide uppercase">
+                Chef&apos;s Choice Today
+              </h3>
+              <Star className="h-4 w-4 text-amber-200" />
+            </div>
+            {chefsChoice.message && (
+              <p className="px-5 pt-3 text-sm text-amber-800 italic">
+                &ldquo;{chefsChoice.message}&rdquo;
+              </p>
+            )}
+            <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {chefsChoice.items.map((item) => {
+                const matchedMenuItem = menuItems.find(
+                  (m) => m.name.toLowerCase() === item.name.toLowerCase()
+                );
+                return (
+                  <div
+                    key={item.id}
+                    className="flex items-start gap-3 bg-white rounded-xl p-3 shadow-sm border border-amber-100 hover:shadow-md transition-shadow"
+                  >
+                    <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center flex-shrink-0 text-lg">
+                      {matchedMenuItem?.image || '⭐'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-900 text-sm">{item.name}</p>
+                      {item.reason && (
+                        <p className="text-xs text-amber-600 mt-0.5">{item.reason}</p>
+                      )}
+                      {item.description && (
+                        <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{item.description}</p>
+                      )}
+                    </div>
+                    {matchedMenuItem && (
+                      <button
+                        onClick={() => addToCart(matchedMenuItem)}
+                        className="flex-shrink-0 h-8 w-8 rounded-lg bg-amber-500 text-white flex items-center justify-center hover:bg-amber-600 transition-colors active:scale-95"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Section header */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-gray-800">

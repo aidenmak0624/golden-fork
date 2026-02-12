@@ -20,7 +20,7 @@ import AIInsightsPanel from '../../components/dashboard/analytics/AIInsightsPane
 import FeedbackStatsPanel from '../../components/dashboard/analytics/FeedbackStatsPanel';
 import { useRealtimeOrders } from '../../hooks/useRealtimeOrders';
 import { useInsights } from '../../hooks/useInsights';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ChefHat, Plus, Trash2, Save, Sparkles } from 'lucide-react';
 
 type TabId = 'orders' | 'notifications' | 'analytics' | 'ai-insights' | 'menu' | 'settings';
 
@@ -95,6 +95,72 @@ function DashboardPageContent() {
   const { insights, feedbackStats, isLoading: insightsLoading } = useInsights();
 
   const pendingOrderCount = orders.filter((o) => o.status === 'pending' || o.status === 'confirmed').length;
+
+  // Chef's Choice state
+  const [chefsChoiceItems, setChefsChoiceItems] = useState<
+    { id: string; name: string; description: string; reason: string }[]
+  >([]);
+  const [chefsChoiceMessage, setChefsChoiceMessage] = useState('');
+  const [chefsChoiceSaving, setChefsChoiceSaving] = useState(false);
+  const [chefsChoiceSaved, setChefsChoiceSaved] = useState(false);
+  const [chefsChoiceLoaded, setChefsChoiceLoaded] = useState(false);
+
+  // Load current Chef's Choice on mount
+  React.useEffect(() => {
+    if (chefsChoiceLoaded) return;
+    fetch('/api/admin/chefs-choice')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.items && data.items.length > 0) {
+          setChefsChoiceItems(data.items);
+          setChefsChoiceMessage(data.message || '');
+        }
+        setChefsChoiceLoaded(true);
+      })
+      .catch(() => setChefsChoiceLoaded(true));
+  }, [chefsChoiceLoaded]);
+
+  const addChefsChoiceItem = () => {
+    setChefsChoiceItems((prev) => [
+      ...prev,
+      { id: `chef-${Date.now()}`, name: '', description: '', reason: '' },
+    ]);
+    setChefsChoiceSaved(false);
+  };
+
+  const removeChefsChoiceItem = (id: string) => {
+    setChefsChoiceItems((prev) => prev.filter((item) => item.id !== id));
+    setChefsChoiceSaved(false);
+  };
+
+  const updateChefsChoiceItem = (id: string, field: string, value: string) => {
+    setChefsChoiceItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item))
+    );
+    setChefsChoiceSaved(false);
+  };
+
+  const saveChefsChoice = async () => {
+    setChefsChoiceSaving(true);
+    try {
+      const res = await fetch('/api/admin/chefs-choice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: chefsChoiceItems.filter((item) => item.name.trim()),
+          message: chefsChoiceMessage,
+        }),
+      });
+      if (res.ok) {
+        setChefsChoiceSaved(true);
+        setTimeout(() => setChefsChoiceSaved(false), 3000);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setChefsChoiceSaving(false);
+    }
+  };
 
   // Poll for active service requests count
   React.useEffect(() => {
@@ -232,7 +298,110 @@ function DashboardPageContent() {
 
       {/* Menu Manager */}
       {activeTab === 'menu' && (
-        <div className="rounded-xl bg-white p-6 shadow-sm border border-gray-200">
+        <div className="space-y-6">
+          {/* Chef's Choice Manager */}
+          <div className="rounded-xl bg-white shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4 flex items-center gap-3">
+              <ChefHat className="h-6 w-6 text-white" />
+              <div>
+                <h2 className="text-lg font-bold text-white">Chef&apos;s Choice Today</h2>
+                <p className="text-amber-100 text-sm">Pick today&apos;s highlighted dishes for customers</p>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-5">
+              {/* Chef's message */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Chef&apos;s Message <span className="font-normal text-gray-400">(optional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={chefsChoiceMessage}
+                  onChange={(e) => { setChefsChoiceMessage(e.target.value); setChefsChoiceSaved(false); }}
+                  placeholder={"e.g. Fresh catch just arrived this morning!"}
+                  className="w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-sm focus:border-amber-400 focus:outline-none focus:ring-4 focus:ring-amber-400/20 transition-all"
+                />
+              </div>
+
+              {/* Items */}
+              <div className="space-y-3">
+                <label className="block text-sm font-semibold text-gray-700">
+                  Featured Dishes
+                </label>
+                {chefsChoiceItems.length === 0 && (
+                  <p className="text-sm text-gray-400 italic py-2">
+                    No dishes selected yet. Add your picks below.
+                  </p>
+                )}
+                {chefsChoiceItems.map((item) => (
+                  <div key={item.id} className="flex gap-3 items-start p-4 rounded-xl bg-amber-50/50 border border-amber-100">
+                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <input
+                        type="text"
+                        value={item.name}
+                        onChange={(e) => updateChefsChoiceItem(item.id, 'name', e.target.value)}
+                        placeholder="Dish name"
+                        className="rounded-lg border border-amber-200 px-3 py-2 text-sm font-medium focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20 bg-white"
+                      />
+                      <input
+                        type="text"
+                        value={item.reason}
+                        onChange={(e) => updateChefsChoiceItem(item.id, 'reason', e.target.value)}
+                        placeholder="Why today? e.g. Freshest ingredients"
+                        className="rounded-lg border border-amber-200 px-3 py-2 text-sm focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20 bg-white"
+                      />
+                      <input
+                        type="text"
+                        value={item.description}
+                        onChange={(e) => updateChefsChoiceItem(item.id, 'description', e.target.value)}
+                        placeholder="Short description (optional)"
+                        className="rounded-lg border border-amber-200 px-3 py-2 text-sm focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/20 bg-white"
+                      />
+                    </div>
+                    <button
+                      onClick={() => removeChefsChoiceItem(item.id)}
+                      className="flex-shrink-0 h-9 w-9 rounded-lg bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-100 transition-colors"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  onClick={addChefsChoiceItem}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-amber-300 text-amber-600 font-medium text-sm hover:bg-amber-50 hover:border-amber-400 transition-all w-full justify-center"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Dish
+                </button>
+              </div>
+
+              {/* Save button */}
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  onClick={saveChefsChoice}
+                  disabled={chefsChoiceSaving || chefsChoiceItems.filter((i) => i.name.trim()).length === 0}
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold shadow-lg shadow-amber-500/25 hover:shadow-xl hover:scale-[1.02] transition-all active:scale-95 disabled:from-gray-300 disabled:to-gray-400 disabled:shadow-none disabled:cursor-not-allowed"
+                >
+                  {chefsChoiceSaving ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4" />
+                  )}
+                  {chefsChoiceSaving ? 'Saving...' : 'Save Chef\'s Choice'}
+                </button>
+                {chefsChoiceSaved && (
+                  <span className="flex items-center gap-1 text-sm text-green-600 font-medium animate-fadeIn">
+                    <Sparkles className="h-4 w-4" />
+                    Saved! Customers can see it now.
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Menu & RAG section */}
+          <div className="rounded-xl bg-white p-6 shadow-sm border border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
             Menu & RAG Knowledge Base
           </h2>
@@ -289,6 +458,7 @@ function DashboardPageContent() {
               Edit System Prompt
             </button>
           </div>
+        </div>
         </div>
       )}
 

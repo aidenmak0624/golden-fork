@@ -1,0 +1,19 @@
+{
+  "date": "2026-02-12",
+  "items": [
+    {
+      "id": "chef-1",
+      "name": "Pan-Seared Duck Breast",
+      "description": "",
+      "reason": "Fresh farm duck, perfectly aged"
+    },
+    {
+      "id": "chef-2",
+      "name": "Lobster Risotto",
+      "description": "",
+      "reason": "Maine lobster arrived this morning"
+    }
+  ],
+  "message": "Our chef recommends these two stars tonight!",
+  "updatedAt": "2026-02-12T08:07:23.743Z"
+}

@@ -11,6 +11,8 @@
 
 import { OpenAI } from 'openai';
 import { Pinecone } from '@pinecone-database/pinecone';
+import fs from 'fs';
+import path from 'path';
 import {
   MenuItem,
   ChatRequest,
@@ -195,6 +197,31 @@ Category: ${item.category}
 }
 
 /**
+ * Load today's Chef's Choice from disk
+ */
+function loadChefsChoice(): string {
+  try {
+    const filePath = path.join(process.cwd(), 'data', 'chefs-choice.json');
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, 'utf-8');
+      const data = JSON.parse(raw);
+      const today = new Date().toISOString().split('T')[0];
+      if (data.date === today && data.items && data.items.length > 0) {
+        const items = data.items
+          .map((item: { name: string; reason: string; description: string }) =>
+            `- **${item.name}**${item.reason ? ` — ${item.reason}` : ''}${item.description ? ` (${item.description})` : ''}`
+          )
+          .join('\n');
+        return `\n\n## 🌟 Chef's Choice Today\n${data.message ? `_"${data.message}"_\n` : ''}${items}\n\nWhen customers ask about chef's picks, chef's choice, chef's recommendations, or today's specials, enthusiastically recommend these dishes and explain why the chef selected them today.`;
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return '';
+}
+
+/**
  * Build the messages array for the chat completion
  */
 function buildMessages(
@@ -206,7 +233,7 @@ function buildMessages(
   const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
     {
       role: 'system',
-      content: `${systemPrompt}\n\n---\n\n## Current Menu Context\n\n${menuContext}`,
+      content: `${systemPrompt}\n\n---\n\n## Current Menu Context\n\n${menuContext}${loadChefsChoice()}`,
     },
   ];
 
