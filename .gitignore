@@ -35,3 +35,14 @@ next-env.d.ts
 .vscode/
 *.swp
 *.swo
+
+# Build cache / session artifacts (accidentally committed)
+sessions/
+tmp/
+var/
+
+# Backup components (not needed in repo)
+src/components/ui-backup/
+
+# Test scripts
+test-rag.ts
