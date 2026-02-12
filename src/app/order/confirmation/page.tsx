@@ -46,12 +46,12 @@ const statusSteps: { status: OrderStatus; label: string; icon: any; description:
 
 function ConfirmationPageContent() {
   const searchParams = useSearchParams();
-  const sessionId = searchParams.get('session_id');
   const tableId = searchParams.get('table');
   const orderId = searchParams.get('order');
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
+  // Always fetch order from API — checkout creates it in-memory before redirecting here
   const { order, status, isLoading, error, estimatedTime } = useOrderTracking(orderId);
 
   const getCurrentStepIndex = () => {
