@@ -812,6 +812,34 @@ function OrderPageContent() {
         tableId={tableId}
         restaurantName="The Golden Fork"
         onAddToCart={handleAISuggestion}
+        onCheckout={async (chatCartItems) => {
+          setIsCheckingOut(true);
+          setCheckoutError(null);
+          try {
+            const response = await fetch('/api/checkout', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                items: chatCartItems.map((item) => ({
+                  id: item.id,
+                  name: item.name,
+                  price: item.price,
+                  quantity: item.quantity,
+                  description: item.name,
+                })),
+                tableId: tableId || 'unknown',
+              }),
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Checkout failed');
+            if (data.url) window.location.href = data.url;
+          } catch (error) {
+            console.error('Chat checkout error:', error);
+            setCheckoutError(error instanceof Error ? error.message : 'Checkout failed');
+          } finally {
+            setIsCheckingOut(false);
+          }
+        }}
       />
     </div>
   );
