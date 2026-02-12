@@ -20,13 +20,14 @@ COPY . .
 
 # Set build-time env (Next.js needs these at build time for public vars)
 ARG NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=""
-ARG NEXT_PUBLIC_WS_URL="ws://localhost:3002"
-ARG NEXT_PUBLIC_BASE_URL="http://localhost:3000"
+ARG NEXT_PUBLIC_WS_URL="wss://golden-fork-9tn2.onrender.com"
+ARG NEXT_PUBLIC_BASE_URL="https://golden-fork-9tn2.onrender.com"
 
 ENV NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=$NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 ENV NEXT_PUBLIC_WS_URL=$NEXT_PUBLIC_WS_URL
 ENV NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_OPTIONS="--max-old-space-size=448"
 
 RUN npm run build
 
