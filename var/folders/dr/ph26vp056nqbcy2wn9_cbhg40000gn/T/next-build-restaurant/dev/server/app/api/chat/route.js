@@ -1,0 +1,13 @@
+var R=require("../../../chunks/[turbopack]_runtime.js")("server/app/api/chat/route.js")
+R.c("server/chunks/node_modules_formdata-node_lib_esm_fileFromPath_94b93a38.js")
+R.c("server/chunks/node_modules_next_dbd0cfd0._.js")
+R.c("server/chunks/node_modules_openai_9a701d8b._.js")
+R.c("server/chunks/node_modules_tr46_3e4df63f._.js")
+R.c("server/chunks/node_modules_iconv-lite_b64e3a8f._.js")
+R.c("server/chunks/node_modules_@pinecone-database_pinecone_dist_d7662e14._.js")
+R.c("server/chunks/node_modules_ajv_dist_c772eb45._.js")
+R.c("server/chunks/node_modules_83579153._.js")
+R.c("server/chunks/[root-of-the-server]__ba6f48dd._.js")
+R.c("server/chunks/_next-internal_server_app_api_chat_route_actions_ac0c75e3.js")
+R.m("[project]/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/src/app/api/chat/route.ts [app-route] (ecmascript)\" } [app-route] (ecmascript)")
+module.exports=R.m("[project]/node_modules/next/dist/esm/build/templates/app-route.js { INNER_APP_ROUTE => \"[project]/src/app/api/chat/route.ts [app-route] (ecmascript)\" } [app-route] (ecmascript)").exports

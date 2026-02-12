@@ -1,0 +1,19 @@
+# ============================================
+# The Golden Fork - Docker Compose
+# ============================================
+# Quick start: docker compose up --build
+# ============================================
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"   # Next.js web app
+      - "3002:3002"   # WebSocket server
+    env_file:
+      - .env.local    # Your local environment variables
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_WS_URL=ws://localhost:3002
+      - NEXT_PUBLIC_BASE_URL=http://localhost:3000
+    restart: unless-stopped
