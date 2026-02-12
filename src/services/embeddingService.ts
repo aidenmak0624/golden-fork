@@ -13,23 +13,29 @@ import { OpenAI } from 'openai';
 import { Pinecone } from '@pinecone-database/pinecone';
 import { MenuItem, MenuChunk } from '../types/menu';
 
-// Validate environment variables
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error('OPENAI_API_KEY environment variable is not set');
+// Lazy-initialized clients (avoids crashing at build time when env vars aren't set)
+let openai: OpenAI | null = null;
+let pinecone: Pinecone | null = null;
+
+function getOpenAI(): OpenAI {
+  if (!openai) {
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY environment variable is not set');
+    }
+    openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return openai;
 }
 
-if (!process.env.PINECONE_API_KEY) {
-  throw new Error('PINECONE_API_KEY environment variable is not set');
+function getPinecone(): Pinecone {
+  if (!pinecone) {
+    if (!process.env.PINECONE_API_KEY) {
+      throw new Error('PINECONE_API_KEY environment variable is not set');
+    }
+    pinecone = new Pinecone({ apiKey: process.env.PINECONE_API_KEY });
+  }
+  return pinecone;
 }
-
-// Initialize clients
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
-const pinecone = new Pinecone({
-  apiKey: process.env.PINECONE_API_KEY,
-});
 
 const INDEX_NAME = process.env.PINECONE_INDEX_NAME || 'restaurant-menu';
 const EMBEDDING_MODEL = 'text-embedding-3-small'; // Cost-effective, good quality
@@ -90,7 +96,7 @@ function menuItemToChunk(item: MenuItem): MenuChunk {
  * Creates embeddings for an array of text chunks
  */
 async function createEmbeddings(texts: string[]): Promise<number[][]> {
-  const response = await openai.embeddings.create({
+  const response = await getOpenAI().embeddings.create({
     model: EMBEDDING_MODEL,
     input: texts,
   });
@@ -110,7 +116,7 @@ export async function indexMenuItems(menuItems: MenuItem[]): Promise<{
 
   try {
     // Get or create the index
-    const index = pinecone.index(INDEX_NAME);
+    const index = getPinecone().index(INDEX_NAME);
 
     // Convert menu items to chunks
     const chunks = menuItems.map(menuItemToChunk);
@@ -164,7 +170,7 @@ export async function indexMenuItems(menuItems: MenuItem[]): Promise<{
  */
 export async function deleteMenuItem(itemId: string): Promise<boolean> {
   try {
-    const index = pinecone.index(INDEX_NAME);
+    const index = getPinecone().index(INDEX_NAME);
     await index.deleteOne(`menu-item-${itemId}`);
     return true;
   } catch (error) {
@@ -178,7 +184,7 @@ export async function deleteMenuItem(itemId: string): Promise<boolean> {
  */
 export async function clearIndex(): Promise<boolean> {
   try {
-    const index = pinecone.index(INDEX_NAME);
+    const index = getPinecone().index(INDEX_NAME);
     await index.deleteAll();
     console.log('Index cleared successfully');
     return true;
@@ -196,7 +202,7 @@ export async function getIndexStats(): Promise<{
   dimension: number;
 } | null> {
   try {
-    const index = pinecone.index(INDEX_NAME);
+    const index = getPinecone().index(INDEX_NAME);
     const stats = await index.describeIndexStats();
     return {
       totalVectors: stats.totalRecordCount || 0,
