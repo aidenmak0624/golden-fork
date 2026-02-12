@@ -140,17 +140,31 @@ function OrderPageContent() {
         <div className="bg-white rounded-2xl shadow-lg p-8 max-w-sm w-full text-center">
           <div className="text-4xl mb-4">🍽️</div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome to The Golden Fork</h1>
-          <p className="text-gray-500 mb-6">Please select your table number to start ordering</p>
-          <div className="grid grid-cols-5 gap-3 mb-6">
-            {Array.from({ length: 15 }, (_, i) => i + 1).map((num) => (
-              <button
-                key={num}
-                onClick={() => setSelectedTable(String(num))}
-                className="aspect-square rounded-xl bg-amber-50 border-2 border-amber-200 text-amber-700 font-bold text-lg hover:bg-amber-100 hover:border-amber-400 transition-colors flex items-center justify-center"
-              >
-                {num}
-              </button>
-            ))}
+          <p className="text-gray-500 mb-6">Please enter your table number to start ordering</p>
+          <div className="flex items-center gap-3 mb-6">
+            <input
+              type="number"
+              min="1"
+              placeholder="Table #"
+              className="flex-1 text-center text-2xl font-bold py-3 px-4 rounded-xl border-2 border-amber-200 focus:border-amber-500 focus:outline-none bg-amber-50 text-amber-700 placeholder-amber-300"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  const val = (e.target as HTMLInputElement).value.trim();
+                  if (val && Number(val) > 0) setSelectedTable(val);
+                }
+              }}
+              autoFocus
+            />
+            <button
+              onClick={() => {
+                const input = document.querySelector('input[type="number"]') as HTMLInputElement;
+                const val = input?.value.trim();
+                if (val && Number(val) > 0) setSelectedTable(val);
+              }}
+              className="py-3 px-6 rounded-xl bg-amber-600 text-white font-bold text-lg hover:bg-amber-700 transition-colors"
+            >
+              Go
+            </button>
           </div>
           <p className="text-xs text-gray-400">
             Normally this is set automatically via your table&apos;s QR code
