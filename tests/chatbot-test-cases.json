@@ -1,0 +1,407 @@
+{
+  "testSuite": "Golden Fork Chatbot - Black Box Test Cases",
+  "description": "50 test cases simulating real customers who know NOTHING about the menu. Each tests a different scenario the chatbot must handle intelligently.",
+  "version": "1.0",
+  "testCases": [
+    {
+      "id": 1,
+      "category": "dietary_exclusion",
+      "input": "I am vegetarian but no onion no garlic",
+      "expectedBehavior": "Should recommend vegetarian dishes after checking ingredients for onion/garlic. Thai Red Curry Vegetables has no onion/garlic. Should NOT say 'I don't see any'.",
+      "mustNotContain": ["I don't see", "don't have", "no specific"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 2,
+      "category": "dietary_exclusion",
+      "input": "I love meat but no beef and pork",
+      "expectedBehavior": "Should recommend chicken, duck, seafood, or lamb dishes. Pan-Seared Duck, Herb-Crusted Salmon, Thai Chicken Lettuce Wraps are all valid.",
+      "mustNotContain": ["I don't see", "don't have", "no specific"],
+      "mustMention": ["duck", "salmon", "chicken"]
+    },
+    {
+      "id": 3,
+      "category": "mood_based",
+      "input": "What about something that is light not too heavy as I'm not feeling well",
+      "expectedBehavior": "Should suggest salads, light appetizers, soups, or simple grilled items. Caesar Salad, Beet Salad, Grilled Broccolini are good options.",
+      "mustNotContain": ["I don't see", "don't have", "no specific light dishes"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 4,
+      "category": "cultural_dietary",
+      "input": "How about halal pork",
+      "expectedBehavior": "Should politely explain pork cannot be halal, then offer halal-friendly alternatives (chicken, lamb, seafood).",
+      "mustNotContain": ["I don't see any halal"],
+      "mustMention": ["halal", "pork"]
+    },
+    {
+      "id": 5,
+      "category": "popular_items",
+      "input": "What are today's top 3 selling items",
+      "expectedBehavior": "Should recommend signature/popular dishes (Ribeye, Duck, Salmon, Lobster Risotto) or chef's choice if available.",
+      "mustNotContain": ["I don't have information on today's top-selling"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 6,
+      "category": "allergen_combo",
+      "input": "Vegetarian but I have allergen to capsicum and peanuts",
+      "expectedBehavior": "Should find vegetarian dishes without capsicum/bell pepper and peanuts. Check ingredients carefully. Burrata, Caesar Salad, Wild Mushroom Fettuccine are options.",
+      "mustNotContain": ["I don't see"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 7,
+      "category": "vague_request",
+      "input": "I'm really hungry, what's good here?",
+      "expectedBehavior": "Should recommend 2-3 popular hearty dishes across categories with prices.",
+      "mustNotContain": ["I don't see", "could you be more specific"],
+      "mustMention": ["$"]
+    },
+    {
+      "id": 8,
+      "category": "budget_conscious",
+      "input": "What can I get for under $15?",
+      "expectedBehavior": "Should list items under $15: Crispy Calamari ($14.99), Thai Chicken Lettuce Wraps ($13.99), Beet Salad ($12.99), Caesar Salad ($11.99), sides, beverages.",
+      "mustNotContain": ["I don't see"],
+      "mustMention": ["$"]
+    },
+    {
+      "id": 9,
+      "category": "special_occasion",
+      "input": "It's our wedding anniversary, we want something really special",
+      "expectedBehavior": "Should recommend premium items: Grilled Ribeye, Lobster Risotto, Pan-Seared Duck with wine pairings.",
+      "mustNotContain": ["I don't see"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 10,
+      "category": "multi_person",
+      "input": "We are a group of 4, one vegetarian, one allergic to shellfish, can you suggest a mix?",
+      "expectedBehavior": "Should suggest a variety: vegetarian option, non-shellfish mains, shared appetizers, noting which is safe for whom.",
+      "mustNotContain": ["I can't help with group"],
+      "mustMention": ["vegetarian"]
+    },
+    {
+      "id": 11,
+      "category": "protein_preference",
+      "input": "I want chicken, what do you have?",
+      "expectedBehavior": "Should find Thai Chicken Lettuce Wraps. May also mention Caesar Salad with added chicken per chef's note.",
+      "mustNotContain": ["I don't see", "no chicken"],
+      "mustMention": ["chicken"]
+    },
+    {
+      "id": 12,
+      "category": "seafood_focus",
+      "input": "I love seafood, show me your best",
+      "expectedBehavior": "Should recommend Herb-Crusted Salmon, Lobster Risotto, Crispy Calamari with descriptions and prices.",
+      "mustNotContain": ["I don't see"],
+      "mustMention": ["salmon", "lobster"]
+    },
+    {
+      "id": 13,
+      "category": "spicy_preference",
+      "input": "I want something spicy, hit me with your hottest!",
+      "expectedBehavior": "Should recommend spicy-flagged items: Thai Chicken Lettuce Wraps, Thai Red Curry Vegetables, Grilled Broccolini.",
+      "mustNotContain": ["I don't see any spicy"],
+      "mustMention": ["spicy", "Thai"]
+    },
+    {
+      "id": 14,
+      "category": "no_spicy",
+      "input": "I can't handle any spice at all, what's mild?",
+      "expectedBehavior": "Should recommend non-spicy dishes and explicitly avoid items marked [Spicy].",
+      "mustNotContain": ["I don't see"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 15,
+      "category": "dessert_focus",
+      "input": "What desserts do you have?",
+      "expectedBehavior": "Should list all desserts: Chocolate Lava Cake, Crème Brûlée, Vegan Coconut Panna Cotta with descriptions.",
+      "mustNotContain": ["I don't see"],
+      "mustMention": ["Chocolate Lava Cake", "Crème Brûlée"]
+    },
+    {
+      "id": 16,
+      "category": "vegan_dessert",
+      "input": "I'm vegan, do you have any desserts for me?",
+      "expectedBehavior": "Should recommend Vegan Coconut Panna Cotta specifically.",
+      "mustNotContain": ["I don't see any vegan desserts"],
+      "mustMention": ["Coconut Panna Cotta"]
+    },
+    {
+      "id": 17,
+      "category": "wine_pairing",
+      "input": "I'm getting the ribeye, what wine goes with it?",
+      "expectedBehavior": "Should recommend Cabernet Sauvignon or Malbec as listed in ribeye pairings.",
+      "mustNotContain": ["I don't see"],
+      "mustMention": ["Cabernet"]
+    },
+    {
+      "id": 18,
+      "category": "ingredient_question",
+      "input": "What's in the carbonara?",
+      "expectedBehavior": "Should describe Spaghetti Carbonara ingredients: guanciale, egg yolk, Pecorino Romano, black pepper.",
+      "mustNotContain": ["I don't see"],
+      "mustMention": ["guanciale", "egg", "Pecorino"]
+    },
+    {
+      "id": 19,
+      "category": "complex_exclusion",
+      "input": "I want something with no dairy, no gluten, and no nuts",
+      "expectedBehavior": "Should find: Thai Red Curry Vegetables (GF, vegan, no nuts), Grilled Broccolini (GF, vegan, no nuts).",
+      "mustNotContain": ["I don't see anything that matches"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 20,
+      "category": "kids_meal",
+      "input": "What would you recommend for a 5 year old?",
+      "expectedBehavior": "Should suggest kid-friendly items: fries, simple pasta, maybe lemonade. Use common sense.",
+      "mustNotContain": ["I don't see any kids"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 21,
+      "category": "language_barrier",
+      "input": "我想吃海鲜",
+      "expectedBehavior": "Should understand Chinese for 'I want to eat seafood' and recommend seafood dishes.",
+      "mustNotContain": ["I don't understand"],
+      "mustMention": ["seafood"]
+    },
+    {
+      "id": 22,
+      "category": "language_barrier",
+      "input": "寿司はありますか",
+      "expectedBehavior": "Should understand Japanese 'do you have sushi' and explain no sushi but suggest similar seafood options.",
+      "mustNotContain": ["I don't understand"],
+      "mustMention": ["seafood"]
+    },
+    {
+      "id": 23,
+      "category": "comparison",
+      "input": "What's the difference between the duck and the ribeye?",
+      "expectedBehavior": "Should compare Pan-Seared Duck ($38.99) with Grilled Ribeye ($52.99) — flavors, preparation, price.",
+      "mustNotContain": ["I don't see"],
+      "mustMention": ["duck", "ribeye"]
+    },
+    {
+      "id": 24,
+      "category": "portion_question",
+      "input": "Is the ribeye enough for two people to share?",
+      "expectedBehavior": "Should mention it's a 16oz steak and give honest advice about sharing.",
+      "mustNotContain": ["I don't see"],
+      "mustMention": ["16oz", "ribeye"]
+    },
+    {
+      "id": 25,
+      "category": "health_conscious",
+      "input": "What's the healthiest thing on your menu?",
+      "expectedBehavior": "Should recommend salads, grilled fish (salmon), grilled broccolini, Thai Red Curry Vegetables.",
+      "mustNotContain": ["I don't see any healthy"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 26,
+      "category": "comfort_food",
+      "input": "I want comfort food, something warm and cozy",
+      "expectedBehavior": "Should suggest: Wild Mushroom Fettuccine, Spaghetti Carbonara, Lobster Risotto, or Thai Red Curry.",
+      "mustNotContain": ["I don't see"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 27,
+      "category": "protein_exclusion",
+      "input": "No fish, no shellfish, what meat options do you have?",
+      "expectedBehavior": "Should recommend: Grilled Ribeye, Pan-Seared Duck, Thai Chicken Lettuce Wraps, Spaghetti Carbonara.",
+      "mustNotContain": ["I don't see"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 28,
+      "category": "starter_main_combo",
+      "input": "Can you suggest a starter and main course combo?",
+      "expectedBehavior": "Should pair an appetizer with a main, e.g. Burrata + Ribeye or Calamari + Salmon.",
+      "mustNotContain": ["I can't suggest combinations"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 29,
+      "category": "full_meal",
+      "input": "Plan a 3-course meal for me — starter, main, dessert",
+      "expectedBehavior": "Should recommend one from each category with logical pairings.",
+      "mustNotContain": ["I can't plan"],
+      "mustMention": ["appetizer", "dessert"]
+    },
+    {
+      "id": 30,
+      "category": "pasta_focus",
+      "input": "I'm craving pasta, what are my options?",
+      "expectedBehavior": "Should list: Spaghetti Carbonara and Wild Mushroom Fettuccine with descriptions.",
+      "mustNotContain": ["I don't see any pasta"],
+      "mustMention": ["Carbonara", "Fettuccine"]
+    },
+    {
+      "id": 31,
+      "category": "vegetarian_pasta",
+      "input": "Any vegetarian pasta?",
+      "expectedBehavior": "Should recommend Wild Mushroom Fettuccine (marked vegetarian).",
+      "mustNotContain": ["I don't see"],
+      "mustMention": ["Mushroom Fettuccine"]
+    },
+    {
+      "id": 32,
+      "category": "dairy_allergy",
+      "input": "I'm allergic to dairy, what can I eat?",
+      "expectedBehavior": "Should find dairy-free items: Thai Red Curry Vegetables, Grilled Broccolini, Thai Chicken Lettuce Wraps, etc.",
+      "mustNotContain": ["I don't see any dairy-free"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 33,
+      "category": "egg_allergy",
+      "input": "I have an egg allergy, what's safe?",
+      "expectedBehavior": "Should check allergens lists and avoid items with eggs (Calamari, Caesar, Carbonara, Chocolate Lava Cake). Recommend items without eggs.",
+      "mustNotContain": ["I don't see"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 34,
+      "category": "indecisive",
+      "input": "I don't know what I want",
+      "expectedBehavior": "Should ask about preferences (meat/seafood/vegetarian) and suggest popular items to get started.",
+      "mustNotContain": ["I can't help if you don't know"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 35,
+      "category": "drink_only",
+      "input": "Just looking for drinks, what do you have?",
+      "expectedBehavior": "Should list beverages and wines: Lemonade, Thai Iced Tea, Cabernet Sauvignon, Chardonnay.",
+      "mustNotContain": ["I don't see any drinks"],
+      "mustMention": ["Lemonade"]
+    },
+    {
+      "id": 36,
+      "category": "non_alcoholic",
+      "input": "Any non-alcoholic drinks?",
+      "expectedBehavior": "Should recommend Fresh Squeezed Lemonade and Thai Iced Tea.",
+      "mustNotContain": ["I don't see"],
+      "mustMention": ["Lemonade"]
+    },
+    {
+      "id": 37,
+      "category": "pescatarian",
+      "input": "I'm pescatarian, what works for me?",
+      "expectedBehavior": "Should recommend seafood + vegetarian items: Salmon, Lobster Risotto, Calamari, plus vegetarian options.",
+      "mustNotContain": ["I don't see any pescatarian"],
+      "mustMention": ["seafood"]
+    },
+    {
+      "id": 38,
+      "category": "low_carb",
+      "input": "I'm on a low carb diet, what can I eat?",
+      "expectedBehavior": "Should suggest protein-focused dishes without heavy carbs: Ribeye with veggies, Salmon, salads, grilled broccolini.",
+      "mustNotContain": ["I don't see any low carb"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 39,
+      "category": "high_protein",
+      "input": "I need something high in protein, I just worked out",
+      "expectedBehavior": "Should recommend protein-rich: Ribeye (16oz steak), Salmon, Duck Breast, chicken dishes.",
+      "mustNotContain": ["I don't see"],
+      "mustMention": ["protein"]
+    },
+    {
+      "id": 40,
+      "category": "date_night",
+      "input": "I'm on a first date, what's impressive but not too messy?",
+      "expectedBehavior": "Should recommend elegant dishes: Duck Breast, Salmon, Lobster Risotto. Avoid messy items like lettuce wraps.",
+      "mustNotContain": ["I can't help with dates"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 41,
+      "category": "chef_choice",
+      "input": "What does the chef recommend?",
+      "expectedBehavior": "Should mention chef's choice items if available, or recommend signature dishes.",
+      "mustNotContain": ["I don't have information on chef"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 42,
+      "category": "gluten_free_main",
+      "input": "I need a gluten-free main course",
+      "expectedBehavior": "Should list GF mains: Duck Breast, Ribeye, Salmon, Lobster Risotto, Thai Red Curry Vegetables.",
+      "mustNotContain": ["I don't see any gluten-free mains"],
+      "mustMention": ["gluten-free"]
+    },
+    {
+      "id": 43,
+      "category": "multi_allergen",
+      "input": "I'm allergic to shellfish and dairy, what mains do you have?",
+      "expectedBehavior": "Should exclude shellfish (calamari, lobster) and dairy items, find safe options like Thai Red Curry Vegetables, Thai Chicken Lettuce Wraps.",
+      "mustNotContain": ["I don't see"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 44,
+      "category": "side_dishes",
+      "input": "What sides can I add to my steak?",
+      "expectedBehavior": "Should recommend Truffle Parmesan Fries and Grilled Broccolini.",
+      "mustNotContain": ["I don't see any sides"],
+      "mustMention": ["Fries", "Broccolini"]
+    },
+    {
+      "id": 45,
+      "category": "follow_up",
+      "input": "Actually, does that have garlic in it?",
+      "expectedBehavior": "Should check the ingredients of the previously discussed dish and give accurate answer about garlic content.",
+      "mustNotContain": ["I don't know"],
+      "mustMention": ["garlic"]
+    },
+    {
+      "id": 46,
+      "category": "price_comparison",
+      "input": "What's your most expensive dish? And cheapest?",
+      "expectedBehavior": "Should identify Grilled Ribeye ($52.99) as most expensive and suggest cheapest options (Lemonade $4.99 or Broccolini $8.99).",
+      "mustNotContain": ["I don't see"],
+      "mustMention": ["$"]
+    },
+    {
+      "id": 47,
+      "category": "mushroom_lover",
+      "input": "I love mushrooms, anything with mushrooms?",
+      "expectedBehavior": "Should find: Wild Mushroom Fettuccine, Grilled Portobello Stack, and Pan-Seared Duck (wild mushroom risotto).",
+      "mustNotContain": ["I don't see any mushroom"],
+      "mustMention": ["mushroom"]
+    },
+    {
+      "id": 48,
+      "category": "no_alcohol",
+      "input": "Can the Thai curry be made without any alcohol?",
+      "expectedBehavior": "Should check ingredients — Thai Red Curry Vegetables doesn't contain alcohol. Confirm it's safe.",
+      "mustNotContain": ["I don't know"],
+      "mustMention": ["Thai Red Curry"]
+    },
+    {
+      "id": 49,
+      "category": "takeaway",
+      "input": "Which dishes travel well for takeaway?",
+      "expectedBehavior": "Should use common sense: curry, pasta, sides travel well. Steak less so. Give thoughtful recommendation.",
+      "mustNotContain": ["I can't help with takeaway"],
+      "mustMention": ["menu item name"]
+    },
+    {
+      "id": 50,
+      "category": "returning_customer",
+      "input": "Last time I had the salmon and loved it. What else would I like?",
+      "expectedBehavior": "Should suggest similar dishes: other seafood (Lobster Risotto), or dishes with similar flavor profile. Use pairings logic.",
+      "mustNotContain": ["I don't have records"],
+      "mustMention": ["menu item name"]
+    }
+  ]
+}
